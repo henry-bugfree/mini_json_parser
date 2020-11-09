@@ -1,0 +1,63 @@
+<G1>
+object
+	: '{' ws '}'
+	| '{' members '}'
+
+members
+	: member
+	| member ',' members
+
+member
+	ws string ws ':' value
+
+value
+	: string
+	| number
+
+<------------------------------------------------>
+
+<G1转化为G1'的中间形式>
+object
+	: '{' object_a
+
+object_a
+	: ws '}'
+	| members '}'
+
+members
+	: member members_a
+
+members_a
+	: epsilon
+	| ',' members
+
+member
+	ws string ws ':' value
+
+value
+	: string
+	| number
+
+<------------------------------------------------>
+
+<G1'>
+object
+	: '{' object_a
+
+object_a
+	: ws object_b
+
+object_b
+	: '}'
+	| string ws ':' value members_a '}'
+
+members
+	: member members_a
+
+members_a
+	: epsilon
+	| ',' members
+
+value
+	: string
+	| number
