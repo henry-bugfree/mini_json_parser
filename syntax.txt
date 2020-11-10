@@ -1,63 +1,101 @@
-<G1>
+json
+    element
+
+value
+    object
+    array
+    string
+    number
+    "true"
+    "false"
+    "null"
+
 object
-	: '{' ws '}'
-	| '{' members '}'
+    '{' ws '}'
+    '{' members '}'
 
 members
-	: member
-	| member ',' members
+    member
+    member ',' members
 
 member
-	ws string ws ':' value
+    ws string ws ':' element
 
-value
-	: string
-	| number
+array
+    '[' ws ']'
+    '[' elements ']'
 
-<------------------------------------------------>
+elements
+    element
+    element ',' elements
 
-<G1转化为G1'的中间形式>
-object
-	: '{' object_a
+element
+    ws value ws
 
-object_a
-	: ws '}'
-	| members '}'
+string
+    '"' characters '"'
 
-members
-	: member members_a
+characters
+    ""
+    character characters
 
-members_a
-	: epsilon
-	| ',' members
+character
+    '0020' . '10FFFF' - '"' - '\'
+    '\' escape
 
-member
-	ws string ws ':' value
+escape
+    '"'
+    '\'
+    '/'
+    'b'
+    'f'
+    'n'
+    'r'
+    't'
+    'u' hex hex hex hex
 
-value
-	: string
-	| number
+hex
+    digit
+    'A' . 'F'
+    'a' . 'f'
 
-<------------------------------------------------>
+number
+    integer fraction exponent
 
-<G1'>
-object
-	: '{' object_a
+integer
+    digit
+    onenine digits
+    '-' digit
+    '-' onenine digits
 
-object_a
-	: ws object_b
+digits
+    digit
+    digit digits
 
-object_b
-	: '}'
-	| string ws ':' value members_a '}'
+digit
+    '0'
+    onenine
 
-members
-	: member members_a
+onenine
+    '1' . '9'
 
-members_a
-	: epsilon
-	| ',' members
+fraction
+    ""
+    '.' digits
 
-value
-	: string
-	| number
+exponent
+    ""
+    'E' sign digits
+    'e' sign digits
+
+sign
+    ""
+    '+'
+    '-'
+
+ws
+    ""
+    '0020' ws
+    '000A' ws
+    '000D' ws
+    '0009' ws
