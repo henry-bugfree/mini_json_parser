@@ -1,6 +1,3 @@
-//
-// Created by HP on 11/6/2020.
-//
 #include "json_parser.h"
 #include "json_scanner.h"
 #include <iostream>
@@ -34,47 +31,46 @@ void parser()
     cur_value = lex[position];
     cur_text = text[position];
     cout << cur_text;
-    object();
+    json();
+}
+
+void json()
+{
+    element();
+}
+
+void value()
+{
+    const vector<int> legal_value{STRING, NUMBER, J_TRUE, J_FALSE, J_NULL};
+    for(const auto& lv : legal_value)
+    {
+        if (lv == cur_value) {
+            advance();
+            return ;
+        }
+    }
+    if(cur_value == '[')
+    {
+        array();
+    }
+    else if(cur_value == '{')
+    {
+        object();
+    }
+    else error();
 }
 
 void object()
 {
     if(cur_value == '{') {
         advance();
-        object_a();
-    }
-    else error();
-}
-
-void object_a()
-{
-    if(cur_value == ' ')
-    {
-        advance();
-        object_b();
-    }
-    else error();
-}
-
-void object_b()
-{
-    if(cur_value == '}')
-        advance();
-    else if(cur_value == STRING)
-    {
-        advance();
-        if(cur_value == ' ')
-        {
+        if(cur_value == '}')
             advance();
-            if(cur_value == ':')
-            {
+        else if(cur_value == STRING)
+        {
+            members();
+            if(cur_value == '}')
                 advance();
-                value();
-                members_a();
-                if(cur_value == '}')
-                    advance();
-                else error();
-            }
             else error();
         }
         else error();
@@ -85,47 +81,47 @@ void object_b()
 void members()
 {
     member();
-    members_a();
-}
-
-void members_a()
-{
-    if(cur_value == ',')
-    {
+    while(cur_value == ',') {
         advance();
-        members();
+        member();
     }
-    else ;
 }
 
 void member()
 {
-    if(cur_value == ' ')
-    {
+    if(cur_value == STRING) {
         advance();
-        if(cur_value == STRING) {
+        if(cur_value == ':')
+        {
             advance();
-            if(cur_value == ' ')
-            {
-                advance();
-                if(cur_value == ':')
-                {
-                    advance();
-                    value();
-                }
-                else error();
-            }
-            else error();
+            element();
         }
         else error();
     }
+    else error();
 }
 
-void value()
+void array()
 {
-    if(cur_value == STRING)
+    if(cur_value == '[') {
         advance();
-    else if(cur_value == NUMBER)
-        advance();
+        if(cur_value == ']')
+            advance();
+        else elements();
+    }
     else error();
+}
+
+void elements()
+{
+    element();
+    while(cur_value == ',') {
+        advance();
+        element();
+    }
+}
+
+void element()
+{
+    value();
 }

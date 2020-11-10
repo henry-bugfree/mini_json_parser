@@ -1,6 +1,3 @@
-//
-// Created by HP on 11/6/2020.
-//
 #include "json_scanner.h"
 #include <iostream>
 #include <fstream>
@@ -48,12 +45,64 @@ void scanner(const string &nameOfFile)
                 buffer+=ch;
                 if(ch == '"') break;
             }
+
+            if(buffer == "true")
+            {
+                text.push_back(buffer);
+                lex.push_back(J_TRUE);
+                buffer = "";
+                continue;
+            }
+
+            else if(buffer == "false")
+            {
+                text.push_back(buffer);
+                lex.push_back(J_FALSE);
+                buffer = "";
+                continue;
+            }
+
+            else if(buffer == "null")
+            {
+                text.push_back(buffer);
+                lex.push_back(J_NULL);
+                buffer = "";
+                continue;
+            }
+
             text.push_back(buffer);
             lex.push_back(STRING);
             buffer = "";
             continue;
         }
 
+        if(ch == '[')
+        {
+            if(!buffer.empty())
+            {
+                lex.push_back(check_value(buffer));
+                text.push_back(buffer);
+                buffer = "";
+            }
+            lex.push_back('[');
+            text.emplace_back(1,ch);
+            continue;
+        }
+
+        if(ch == ']')
+        {
+            if(!buffer.empty())
+            {
+                lex.push_back(check_value(buffer));
+                text.push_back(buffer);
+                buffer = "";
+            }
+            lex.push_back('[');
+            text.emplace_back(1,ch);
+            continue;
+        }
+
+        /*
         if(ch == ' ')
         {
             if(!buffer.empty())
@@ -66,8 +115,9 @@ void scanner(const string &nameOfFile)
             text.emplace_back(1,ch);
             continue;
         }
+         */
 
-        if(ch == '\n')
+        if(ch == '\n' || ch == ' ')
         {
             if(!buffer.empty())
             {
